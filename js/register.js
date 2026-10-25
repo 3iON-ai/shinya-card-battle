@@ -6,6 +6,7 @@ const Register = (() => {
   let qrData = null;     // QRの裏データ（読めなければ null）
   let sheetURL = null;   // 縮小したシート画像（dataURL）
   let sheet = null;      // 切り出し済みシート
+  let sheetWeapon = null; // ステータス用テキストに書かれた、シートに描いた武器
   let sample = null;     // Claudeにカードを読ませる機能（claude.ai上で開いたときだけ使える）
   let readCtl = null;
 
@@ -98,6 +99,7 @@ const Register = (() => {
     }
     const total = Number(r.total ?? r.TOTAL);
     if (total > 0) set('fTotal', Math.round(total));
+    if (Stats.WEAPONS[r.weapon]) sheetWeapon = r.weapon;
     validate();
     return n;
   }
@@ -105,8 +107,10 @@ const Register = (() => {
   // AIの返事を貼り付け：前後に文章やコードブロックの記号があっても { 〜 } を取り出して読む
   function onPaste() {
     const text = $('pasteBox').value;
+    sheetWeapon = null;
     if (!text.trim()) {
       setStatus('pasteStatus', '');
+      validate();
       return;
     }
     const s = text.indexOf('{'), e = text.lastIndexOf('}');
@@ -172,7 +176,12 @@ const Register = (() => {
 
   function validate() {
     const total = Number($('fTotal').value);
-    if (total > 0) {
+    if (sheetWeapon) {
+      const w = sheetWeapon, calc = total > 0 ? Stats.weaponFromTotal(total) : null;
+      $('weaponView').textContent = calc && calc !== w
+        ? `武器：${Stats.WEAPONS[w].icon} ${w}（シートの絵に合わせます。TOTALの計算では ${Stats.WEAPONS[calc].icon} ${calc}）`
+        : `武器：${Stats.WEAPONS[w].icon} ${w}`;
+    } else if (total > 0) {
       const w = Stats.weaponFromTotal(total);
       $('weaponView').textContent = `武器：${Stats.WEAPONS[w].icon} ${w}（${total} ÷ 4 の余り ${total % 4}）`;
     } else {
@@ -191,7 +200,7 @@ const Register = (() => {
       await Storage.put({
         id,
         ...form,
-        weapon: Stats.weaponFromTotal(form.total),
+        weapon: sheetWeapon || Stats.weaponFromTotal(form.total),
         qr: qrData,
         cardThumb,
         sheet: sheetURL,
@@ -205,7 +214,7 @@ const Register = (() => {
   }
 
   function reset() {
-    cardThumb = qrData = sheetURL = sheet = null;
+    cardThumb = qrData = sheetURL = sheet = sheetWeapon = null;
     $('cardPreview').removeAttribute('src');
     for (const el of document.querySelectorAll('#screen-register input')) el.value = '';
     $('pasteBox').value = '';
