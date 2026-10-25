@@ -1,10 +1,10 @@
 // --- バトル本体（stage1.html の骨格を拡張） ---
 const Battle = (() => {
-  const TILE = 88, COLS = 8, ROWS = 6;
+  const TILE = 88, COLS = 12, ROWS = 7;
   const UNIT_H = Math.round(TILE * 1.05); // マスより少し大きく、頭が上のマスにかかる
   const FOOT = 10;                        // マス下端から足元までの余白（HPバー用）
-  const PLAYER_POS = [[0, 1], [0, 3], [0, 5]];
-  const ENEMY_POS = [[7, 0], [7, 2], [7, 4]];
+  const PLAYER_POS = [[1, 1], [0, 3], [1, 5]];
+  const ENEMY_POS = [[10, 1], [11, 3], [10, 5]];
   const $ = id => document.getElementById(id);
   const sleep = ms => new Promise(r => setTimeout(r, ms));
   const key = (x, y) => x + ',' + y;
