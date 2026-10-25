@@ -1,0 +1,291 @@
+/* 暗い画面で統一したゲーム画面（単一テーマ） */
+:root {
+  color-scheme: dark;
+}
+body {
+  background: #222;
+  color: #eee;
+  font-family: "Hiragino Sans", "Meiryo", sans-serif;
+  margin: 0;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 0 40px;
+}
+header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 12px 0;
+  border-bottom: 1px solid #444;
+}
+h1 {
+  font-size: 20px;
+  margin: 0;
+}
+h2 {
+  font-size: 16px;
+  margin: 16px 0 8px;
+}
+button {
+  font-size: 15px;
+  padding: 6px 14px;
+  cursor: pointer;
+  border: 1px solid #666;
+  border-radius: 4px;
+  background: #3a3a3a;
+  color: #eee;
+}
+button:hover:not(:disabled) {
+  background: #4a4a4a;
+}
+button:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+button.primary {
+  background: #2e6bd6;
+  border-color: #2e6bd6;
+}
+button.primary:hover:not(:disabled) {
+  background: #3b7cf0;
+}
+nav button.active {
+  background: #2e6bd6;
+  border-color: #2e6bd6;
+}
+.screen {
+  max-width: 900px;
+  margin: 16px auto;
+}
+.panel {
+  background: #2d2d2d;
+  border-radius: 6px;
+  padding: 12px 16px;
+}
+.status {
+  font-size: 13px;
+  min-height: 18px;
+  margin: 6px 0;
+  color: #bbb;
+}
+.status.ok { color: #6fcf6f; }
+.status.ng { color: #ff8a80; }
+.hint {
+  font-size: 12px;
+  color: #999;
+  margin: 0 0 8px;
+}
+.player-color { color: #64a8ff; }
+.enemy-color { color: #ff6b6b; }
+
+/* ----- 登録 ----- */
+.reg-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+.drop {
+  display: block;
+  border: 2px dashed #666;
+  border-radius: 6px;
+  padding: 16px;
+  text-align: center;
+  font-size: 13px;
+  color: #aaa;
+  cursor: pointer;
+}
+.drop.over { border-color: #2e6bd6; color: #fff; }
+.drop input { display: none; }
+#cardPreview {
+  display: block;
+  width: 100%;
+  margin-top: 10px;
+  border-radius: 4px;
+}
+#cardPreview:not([src]) { display: none; }
+.form label {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 14px;
+  margin: 4px 0;
+}
+.form input {
+  width: 55%;
+  font-size: 14px;
+  padding: 4px 6px;
+  background: #1e1e1e;
+  color: #eee;
+  border: 1px solid #555;
+  border-radius: 4px;
+}
+.steps {
+  font-size: 13px;
+  padding-left: 20px;
+  margin: 0 0 8px;
+  line-height: 1.8;
+}
+.steps button { font-size: 12px; padding: 2px 8px; margin-left: 4px; }
+.prompt-text, .paste-box {
+  width: 100%;
+  box-sizing: border-box;
+  font-size: 12px;
+  padding: 6px;
+  background: #1e1e1e;
+  color: #eee;
+  border: 1px solid #555;
+  border-radius: 4px;
+}
+.prompt-text { height: 120px; margin-bottom: 6px; }
+.paste-box { height: 70px; }
+.stat-inputs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: 12px;
+}
+.stat-inputs input { width: 45%; }
+.weapon-view {
+  font-size: 15px;
+  margin-top: 8px;
+  min-height: 20px;
+}
+.sheet-preview {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-top: 8px;
+}
+.sheet-preview canvas {
+  background: #4a7a3a;
+  border-radius: 4px;
+  max-width: 100%;
+}
+#saveBtn { margin-top: 12px; width: 100%; }
+
+/* ----- 編成 ----- */
+.slots {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+.slot-list {
+  min-height: 40px;
+}
+.slot {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #3a3a3a;
+  border-radius: 4px;
+  padding: 4px 8px;
+  margin: 4px 0;
+  font-size: 14px;
+}
+.slot button { padding: 2px 8px; font-size: 13px; }
+#startBtn { display: block; margin: 16px auto; font-size: 18px; padding: 8px 40px; }
+.roster {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 10px;
+}
+.roster-item {
+  background: #2d2d2d;
+  border-radius: 6px;
+  padding: 8px;
+  text-align: center;
+  font-size: 13px;
+}
+.roster-item canvas {
+  background: #4a7a3a;
+  border-radius: 4px;
+}
+.roster-item .name { font-size: 15px; font-weight: bold; margin-top: 4px; }
+.roster-item .sub { color: #aaa; font-size: 12px; }
+.roster-item .btns { display: flex; gap: 4px; justify-content: center; margin-top: 6px; flex-wrap: wrap; }
+.roster-item .btns button { font-size: 12px; padding: 3px 6px; }
+
+/* ----- バトル ----- */
+#screen-battle { text-align: center; }
+.phase { font-size: 20px; font-weight: bold; }
+.log {
+  max-width: 512px;
+  margin: 8px auto;
+  min-height: 20px;
+  background: #333;
+  border-radius: 6px;
+  padding: 8px;
+  font-size: 14px;
+  text-align: left;
+}
+.board-wrap {
+  position: relative;
+  display: inline-block;
+  max-width: 100%;
+}
+#board {
+  display: block;
+  border: 3px solid #555;
+  max-width: 100%;
+}
+.result {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: rgba(0, 0, 0, 0.45);
+  font-size: 28px;
+  font-weight: bold;
+}
+.result[hidden] { display: none; }
+.actions { margin: 8px 0; }
+.actions[hidden] { display: none; }
+.info {
+  max-width: 512px;
+  margin: 8px auto;
+  min-height: 60px;
+  background: #333;
+  border-radius: 6px;
+  padding: 8px;
+  font-size: 13px;
+  text-align: left;
+  display: flex;
+  gap: 10px;
+}
+.info img { width: 72px; border-radius: 4px; align-self: flex-start; }
+.info .name { font-size: 15px; font-weight: bold; }
+.battle-buttons { margin-top: 8px; display: flex; gap: 8px; justify-content: center; }
+
+/* ----- 確認ウィンドウ ----- */
+.dialog {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 20;
+}
+.dialog-box {
+  background: #2d2d2d;
+  border: 1px solid #555;
+  border-radius: 6px;
+  padding: 16px 20px;
+  max-width: min(360px, 90vw);
+  font-size: 15px;
+  text-align: center;
+}
+.dialog-buttons {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  margin-top: 14px;
+}
+
+@media (max-width: 700px) {
+  .reg-grid, .slots { grid-template-columns: 1fr; }
+}

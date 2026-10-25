@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+</head>
+<body>
+<title>FEライクゲーム</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta charset="UTF-8">
+<link rel="stylesheet" href="css/game.css">
+
+<header>
+  <h1>FEライクゲーム</h1>
+  <nav>
+    <button data-screen="register">キャラ登録</button>
+    <button data-screen="team">編成</button>
+  </nav>
+</header>
+
+<!-- ===== 登録画面 ===== -->
+<section id="screen-register" class="screen">
+  <div class="reg-grid">
+    <div class="panel">
+      <h2>① キャラカード</h2>
+      <label class="drop" id="cardDrop">
+        <input type="file" id="cardFile" accept="image/*">
+        <span>カード画像をクリックで選択／ドロップ</span>
+      </label>
+      <img id="cardPreview" alt="">
+      <div id="qrStatus" class="status"></div>
+    </div>
+
+    <div class="panel">
+      <h2>② ステータス設定用のテキスト</h2>
+      <ol class="steps">
+        <li>指示文をコピー <button id="copyPromptBtn">指示文をコピー</button></li>
+        <li>ふだん使っているAI（Claude・ChatGPT・Geminiなど）に、カード画像と指示文を貼って送る</li>
+        <li>AIの返事をまるごと下に貼り付ける</li>
+      </ol>
+      <textarea id="promptText" class="prompt-text" readonly hidden></textarea>
+      <textarea id="pasteBox" class="paste-box" placeholder='ここにAIの返事を貼り付け（例：{"name": "鹿", "total": 420, ...}）'></textarea>
+      <div id="pasteStatus" class="status"></div>
+      <p class="hint" id="formHint">貼り付けると下の欄が埋まります。違うところがあれば直してください。</p>
+      <div id="aiStatus" class="status"></div>
+      <div class="form">
+        <label>キャラ名<input type="text" id="fName"></label>
+        <label>Xアカウント<input type="text" id="fXid" placeholder="@example"></label>
+        <div id="statInputs" class="stat-inputs"></div>
+        <label>TOTAL（カードの表記どおり）<input type="number" id="fTotal" min="1" max="999"></label>
+        <div id="weaponView" class="weapon-view"></div>
+      </div>
+
+      <h2>③ スプライトシート</h2>
+      <label class="drop" id="sheetDrop">
+        <input type="file" id="sheetFile" accept="image/*">
+        <span>シート画像をクリックで選択／ドロップ</span>
+      </label>
+      <div class="sheet-preview">
+        <canvas id="sheetIdle" width="120" height="120"></canvas>
+        <canvas id="sheetFrames" width="400" height="60"></canvas>
+      </div>
+      <div id="sheetStatus" class="status"></div>
+
+      <button id="saveBtn" class="primary" disabled>登録する</button>
+      <div id="saveStatus" class="status"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 編成画面 ===== -->
+<section id="screen-team" class="screen" hidden>
+  <div class="slots">
+    <div class="panel">
+      <h2 class="player-color">自軍（最大3体）</h2>
+      <div id="playerSlots" class="slot-list"></div>
+    </div>
+    <div class="panel">
+      <h2 class="enemy-color">敵軍（最大3体）</h2>
+      <div id="enemySlots" class="slot-list"></div>
+    </div>
+  </div>
+  <button id="startBtn" class="primary" disabled>出撃！</button>
+  <h2>登録済みキャラ</h2>
+  <div id="roster" class="roster"></div>
+</section>
+
+<!-- ===== バトル画面 ===== -->
+<section id="screen-battle" class="screen" hidden>
+  <div id="phase" class="phase"></div>
+  <div id="log" class="log"></div>
+  <div class="board-wrap">
+    <canvas id="board" width="512" height="384"></canvas>
+    <div id="result" class="result" hidden>
+      <div id="resultText"></div>
+      <button id="retryBtn" class="primary">もう一度</button>
+      <button id="backBtn">編成に戻る</button>
+    </div>
+  </div>
+  <div id="actions" class="actions" hidden>
+    <button id="waitBtn">待機</button>
+    <button id="cancelBtn">キャンセル</button>
+  </div>
+  <div id="info" class="info"></div>
+  <div class="battle-buttons">
+    <button id="endTurnBtn">ターン終了</button>
+    <button id="retreatBtn">編成に戻る</button>
+  </div>
+</section>
+
+<!-- ===== 確認ウィンドウ（confirm() は公開ページで使えないため） ===== -->
+<div id="dialog" class="dialog" hidden>
+  <div class="dialog-box">
+    <div id="dialogText"></div>
+    <div class="dialog-buttons">
+      <button id="dialogOk" class="primary">はい</button>
+      <button id="dialogNg">いいえ</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
+<script src="js/stats.js"></script>
+<script src="js/storage.js"></script>
+<script src="js/qr.js"></script>
+<script src="js/sprite.js"></script>
+<script src="js/ai.js"></script>
+<script src="js/register.js"></script>
+<script src="js/team.js"></script>
+<script src="js/battle.js"></script>
+<script>
+const App = {
+  current: null,
+  show(name) {
+    for (const s of document.querySelectorAll('.screen')) s.hidden = s.id !== 'screen-' + name;
+    for (const b of document.querySelectorAll('nav button')) b.classList.toggle('active', b.dataset.screen === name);
+    this.current = name;
+    if (name === 'team') Team.refresh();
+  },
+  confirm(message) {
+    return new Promise(resolve => {
+      const box = document.getElementById('dialog');
+      const ok = document.getElementById('dialogOk');
+      const ng = document.getElementById('dialogNg');
+      document.getElementById('dialogText').textContent = message;
+      box.hidden = false;
+      const done = v => {
+        box.hidden = true;
+        ok.onclick = ng.onclick = null;
+        resolve(v);
+      };
+      ok.onclick = () => done(true);
+      ng.onclick = () => done(false);
+    });
+  },
+};
+
+for (const b of document.querySelectorAll('nav button')) {
+  b.addEventListener('click', async () => {
+    if (App.current === 'battle' && !(await App.confirm('バトルを中断しますか？'))) return;
+    App.show(b.dataset.screen);
+  });
+}
+
+Register.init();
+Team.init();
+Battle.init();
+
+// 登録済みキャラがいれば編成画面から始める
+Storage.getAll()
+  .then(list => App.show(list.length ? 'team' : 'register'))
+  .catch(() => App.show('register'));
+</script>
+</body>
+</html>
