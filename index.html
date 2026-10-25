@@ -33,12 +33,16 @@
 
     <div class="panel">
       <h2>② ステータス設定用のテキスト</h2>
-      <ol class="steps">
-        <li>指示文をコピー <button id="copyPromptBtn">指示文をコピー</button></li>
-        <li>ふだん使っているAI（Claude・ChatGPT・Geminiなど）に、カード画像と指示文を貼って送る</li>
-        <li>AIの返事をまるごと下に貼り付ける</li>
-      </ol>
-      <textarea id="promptText" class="prompt-text" readonly hidden></textarea>
+      <p class="hint">ドット絵を創ったAIに「ステータス」と送ると出てくるテキストを、まるごと貼り付けてください。</p>
+      <details class="fallback">
+        <summary>テキストが手元にないとき</summary>
+        <ol class="steps">
+          <li>指示文をコピー <button id="copyPromptBtn">指示文をコピー</button></li>
+          <li>ふだん使っているAI（Claude・ChatGPT・Geminiなど）に、カード画像と指示文を貼って送る</li>
+          <li>AIの返事をまるごと下に貼り付ける</li>
+        </ol>
+        <textarea id="promptText" class="prompt-text" readonly hidden></textarea>
+      </details>
       <textarea id="pasteBox" class="paste-box" placeholder='ここにAIの返事を貼り付け（例：{"name": "鹿", "total": 420, ...}）'></textarea>
       <div id="pasteStatus" class="status"></div>
       <p class="hint" id="formHint">貼り付けると下の欄が埋まります。違うところがあれば直してください。</p>

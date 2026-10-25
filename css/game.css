@@ -126,6 +126,14 @@ nav button.active {
   border: 1px solid #555;
   border-radius: 4px;
 }
+.fallback {
+  font-size: 13px;
+  margin-bottom: 8px;
+}
+.fallback summary {
+  cursor: pointer;
+  color: #9ab;
+}
 .steps {
   font-size: 13px;
   padding-left: 20px;
@@ -215,7 +223,7 @@ nav button.active {
 #screen-battle { text-align: center; }
 .phase { font-size: 20px; font-weight: bold; }
 .log {
-  max-width: 512px;
+  max-width: 704px;
   margin: 8px auto;
   min-height: 20px;
   background: #333;
@@ -250,7 +258,7 @@ nav button.active {
 .actions { margin: 8px 0; }
 .actions[hidden] { display: none; }
 .info {
-  max-width: 512px;
+  max-width: 704px;
   margin: 8px auto;
   min-height: 60px;
   background: #333;

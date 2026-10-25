@@ -1,7 +1,8 @@
 // --- バトル本体（stage1.html の骨格を拡張） ---
 const Battle = (() => {
-  const TILE = 64, COLS = 8, ROWS = 6;
-  const UNIT_H = TILE - 6;
+  const TILE = 88, COLS = 8, ROWS = 6;
+  const UNIT_H = Math.round(TILE * 1.05); // マスより少し大きく、頭が上のマスにかかる
+  const FOOT = 10;                        // マス下端から足元までの余白（HPバー用）
   const PLAYER_POS = [[0, 1], [0, 3], [0, 5]];
   const ENEMY_POS = [[7, 0], [7, 2], [7, 4]];
   const $ = id => document.getElementById(id);
@@ -148,11 +149,11 @@ const Battle = (() => {
   function drawUnit(u, t, now) {
     const shake = now < u.shakeUntil ? Math.round(Math.sin(now / 15) * 3) : 0;
     const cx = u.x * TILE + TILE / 2 + u.ox + shake;
-    const foot = u.y * TILE + TILE - 4 + u.oy;
+    const foot = u.y * TILE + TILE - FOOT + u.oy;
 
     ctx.fillStyle = u.team === 'player' ? 'rgba(80,150,255,0.6)' : 'rgba(255,70,70,0.6)';
     ctx.beginPath();
-    ctx.ellipse(cx, foot - 2, 18, 6, 0, 0, Math.PI * 2);
+    ctx.ellipse(cx, foot - 2, TILE * 0.28, 7, 0, 0, Math.PI * 2);
     ctx.fill();
 
     let n;
@@ -169,7 +170,7 @@ const Battle = (() => {
     if (u.alpha > 0.5) {
       const barW = TILE * 0.7;
       const bx = u.x * TILE + (TILE - barW) / 2 + u.ox;
-      const by = u.y * TILE + 2 + u.oy;
+      const by = u.y * TILE + TILE - 7 + u.oy;
       const ratio = Math.max(0, u.hp / u.gs.maxHp);
       ctx.fillStyle = '#000';
       ctx.fillRect(bx, by, barW, 5);
@@ -342,8 +343,8 @@ const Battle = (() => {
       await sleep(260);
     } else {
       await tween(90, k => {
-        att.ox = dx * 16 * k;
-        att.oy = dy * 16 * k;
+        att.ox = dx * 22 * k;
+        att.oy = dy * 22 * k;
       });
     }
 
@@ -364,8 +365,8 @@ const Battle = (() => {
 
     att.frame = 10;
     await tween(120, k => {
-      att.ox = (att.gs.ranged ? 0 : dx * 16) * (1 - k);
-      att.oy = (att.gs.ranged ? 0 : dy * 16) * (1 - k);
+      att.ox = (att.gs.ranged ? 0 : dx * 22) * (1 - k);
+      att.oy = (att.gs.ranged ? 0 : dy * 22) * (1 - k);
     });
     await sleep(120);
     att.frame = null;
@@ -551,6 +552,8 @@ const Battle = (() => {
 
   function init() {
     canvas = $('board');
+    canvas.width = COLS * TILE;
+    canvas.height = ROWS * TILE;
     ctx = canvas.getContext('2d');
     canvas.addEventListener('click', onClick);
     canvas.addEventListener('contextmenu', e => {
